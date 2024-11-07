@@ -17,6 +17,32 @@
 
 #include <ctype.h>
 
+#ifdef __SWITCH__
+#include <switch.h>
+static std::string OnScreenKeyboard(std::string title, std::string init)
+{
+	SwkbdConfig kbd;
+	Result rc;
+	static char tmp_out[4096];
+
+	tmp_out[0] = 0;
+
+	rc = swkbdCreate(&kbd, 0);
+	if (R_SUCCEEDED(rc))
+	{
+		swkbdConfigMakePresetDefault(&kbd);
+		swkbdConfigSetInitialText(&kbd, init.c_str());
+		swkbdConfigSetGuideText(&kbd, title.c_str());
+		rc = swkbdShow(&kbd, tmp_out, sizeof(tmp_out));
+		swkbdClose(&kbd);
+		if (R_SUCCEEDED(rc))
+			return std::string(tmp_out);
+	}
+
+	return std::string("");
+}
+#endif
+
 namespace MyGUI
 {
 
@@ -630,6 +656,13 @@ namespace MyGUI
 				mStartSelect = mEndSelect = mCursorPosition;
 			}
 		}
+#ifdef __SWITCH__
+		else if (_key == KeyCode::F1) // this is sent by openmw
+		{
+			std::string s = OnScreenKeyboard("Enter text", getCaption());
+			setText(s, false);
+		}
+#endif
 		else
 		{
 			// если не нажат контрл, то обрабатываем как текст

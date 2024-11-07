@@ -35,6 +35,11 @@ if (UNIX)
 	endif ()
 endif()
 
+if (SWITCH_LIBNX)
+	add_definitions(-D__SWITCH__)
+	include_directories(SYSTEM "$ENV{DEVKITPRO}/libnx/include")
+endif()
+
 if (MYGUI_USE_FREETYPE)
 	target_link_libraries(${PROJECTNAME}
 		${FREETYPE_LIBRARIES}
